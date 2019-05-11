@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.gentler.drawview.ui.MainActivity">
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_path"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_20"
+        android:text="@string/write_panel" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_heart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_path"
+        android:layout_marginTop="@dimen/dp_20"
+        android:text="@string/diy_draw" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_heart2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_heart"
+        android:layout_marginTop="@dimen/dp_20"
+        android:text="@string/diy_draw" />
+</RelativeLayout>
