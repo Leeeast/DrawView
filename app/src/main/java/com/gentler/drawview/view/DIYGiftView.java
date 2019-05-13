@@ -5,7 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathEffect;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -40,6 +43,12 @@ public class DIYGiftView extends View {
     private int mDownY;
     private int mLastX;
     private int mLastY;
+    private int backgroundColor = Color.argb(204, 0, 0, 0);
+    private int mWidth;
+    private int mHeight;
+    private Paint mBorderPaint;
+    private int mBorderPadding = 3;
+    private Path mBorderPath;
 
 
     public DIYGiftView(Context context) {
@@ -59,13 +68,15 @@ public class DIYGiftView extends View {
     private void init() {
         initBitmap();
         initPaint();
-        initSurfaceView();
+        initView();
     }
 
-    private void initSurfaceView() {
+    private void initView() {
         setFocusable(true);
         setFocusableInTouchMode(true);
         setKeepScreenOn(true);
+        setBackgroundResource(R.color.colorPrimaryDark);
+        setBackgroundColor(backgroundColor);
     }
 
     public void setBitmapSource(int bitmapSource) {
@@ -88,6 +99,13 @@ public class DIYGiftView extends View {
         mPaint.setColor(mContext.getResources().getColor(R.color.colorAccent));
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(3);
+
+        mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mBorderPaint.setColor(Color.parseColor("#FF979797"));
+        mBorderPaint.setStrokeWidth(1f);
+        mBorderPaint.setStyle(Paint.Style.STROKE);
+        PathEffect effects = new DashPathEffect(new float[]{10, 10}, 0);//设置虚线的间隔和点的长度
+        mBorderPaint.setPathEffect(effects);
     }
 
     public void setDataList(CopyOnWriteArrayList<DIYGiftModel> dataList) {
@@ -109,16 +127,10 @@ public class DIYGiftView extends View {
 //        canvas.drawRect(mRect,mPaint);
 //        canvas.drawBitmap(mScaledBitmap,100,100,mPaint);
         Iterator<DIYGiftModel> iterator = mDiyGiftModelList.iterator();
-//        while (iterator.hasNext()) {
-//            DIYGiftModel point = iterator.next();
-//            if (null != point) {
-//                canvas.drawBitmap(mScaledBitmap, point.getX() - mScaledBitmap.getWidth() / 2, point.getY() - mScaledBitmap.getHeight() / 2, mPaint);
-//            }
-//        }
-        while (mDiyGiftModelList.size() > 0) {
-            DIYGiftModel diyGiftModel = mDiyGiftModelList.remove(0);
-            if (diyGiftModel != null) {
-                canvas.drawBitmap(mScaledBitmap, diyGiftModel.getX() - mScaledBitmap.getWidth() / 2, diyGiftModel.getY() - mScaledBitmap.getHeight() / 2, mPaint);
+        while (iterator.hasNext()) {
+            DIYGiftModel point = iterator.next();
+            if (null != point) {
+                canvas.drawBitmap(mScaledBitmap, point.getX() - mScaledBitmap.getWidth() / 2, point.getY() - mScaledBitmap.getHeight() / 2, mPaint);
             }
         }
     }
@@ -126,7 +138,28 @@ public class DIYGiftView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //super.onDraw(canvas);
+        drawBorder(canvas);
         drawSomething(canvas);
+    }
+
+    private void drawBorder(Canvas canvas) {
+        if (mBorderPath == null) {
+            mBorderPath = new Path();
+            mBorderPath.moveTo(mBorderPadding, mBorderPadding);
+            mBorderPath.lineTo(mWidth - mBorderPadding, mBorderPadding);
+            mBorderPath.lineTo(mWidth - mBorderPadding, mHeight - mBorderPadding);
+            mBorderPath.lineTo(mBorderPadding, mHeight - mBorderPadding);
+            mBorderPath.lineTo(mBorderPadding, mBorderPadding);
+        }
+        canvas.drawPath(mBorderPath, mBorderPaint);
+
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        mWidth = MeasureSpec.getSize(widthMeasureSpec);
+        mHeight = MeasureSpec.getSize(heightMeasureSpec);
     }
 
     @Override
