@@ -17,7 +17,9 @@ public class DIYGiftRes {
     public static final int ROSE = R.mipmap.rose;
     public static final int HEART = R.mipmap.heart;
 
-    public static final int[] mDIYGiftResArray=new int[]{DIYGiftRes.HEART,DIYGiftRes.SUN,DIYGiftRes.BEAR,
-            DIYGiftRes.ICE_CREAM,DIYGiftRes.LOVE,DIYGiftRes.STAR,DIYGiftRes.CAKE,DIYGiftRes.ROSE};
 
+    public static final int[] mDIYGiftResArray = new int[]{DIYGiftRes.HEART, DIYGiftRes.SUN, DIYGiftRes.BEAR,
+            DIYGiftRes.ICE_CREAM, DIYGiftRes.LOVE, DIYGiftRes.STAR, DIYGiftRes.CAKE, DIYGiftRes.ROSE,
+            R.mipmap.bbt, R.mipmap.book, R.mipmap.hua, R.mipmap.lyhc, R.mipmap.monkey,
+            R.mipmap.rose2, R.mipmap.water_m, R.mipmap.wawa, R.mipmap.zgj};
 }

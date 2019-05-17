@@ -43,6 +43,7 @@ public class DIYGiftView extends View {
     private int mDownY;
     private int mLastX;
     private int mLastY;
+    private int moveDistance;
     private int backgroundColor = Color.argb(204, 0, 0, 0);
     private int mWidth;
     private int mHeight;
@@ -176,29 +177,31 @@ public class DIYGiftView extends View {
                 mDIYGiftModel.setX(mDownX);
                 mDIYGiftModel.setY(mDownY);
                 mDiyGiftModelList.add(mDIYGiftModel);
+                postInvalidate();
                 return true;
             case MotionEvent.ACTION_MOVE:
                 int moveX = (int) event.getX();
                 int moveY = (int) event.getY();
 
                 int distance = (int) Math.pow(moveX - mLastX, 2) + (int) Math.pow(moveY - mLastY, 2);
-
-                int reference = (int) Math.pow(100, 2);
+                moveDistance += (int) Math.pow(distance, 0.5);
+                mLastX = moveX;
+                mLastY = moveY;
+                int reference = 100;
                 Log.e(TAG, "distance:" + distance);
                 Log.e(TAG, "distance开方:" + Math.pow(distance, 0.5));
+                Log.e(TAG, "moveDistance:" + moveDistance);
 
 //                Log.e(TAG,"Math.pow(90,2):"+(int)Math.pow(90,2));
-                if (distance >= reference/* - 2000&& distance <= reference + 2000*/) {
+                if (moveDistance >= reference/* - 2000&& distance <= reference + 2000*/) {
                     mDIYGiftModel = new DIYGiftModel();
                     mDIYGiftModel.setGiftRes(mBitmapResId);
                     mDIYGiftModel.setX(moveX);
                     mDIYGiftModel.setY(moveY);
                     mDiyGiftModelList.add(mDIYGiftModel);
-                    mLastX = moveX;
-                    mLastY = moveY;
-
-//                    postInvalidate();
-                    postInvalidate(moveX, moveY, moveX + mScaledBitmap.getWidth(), moveY + mScaledBitmap.getHeight());
+//                    postInvalidate(mLastX, mLastY, mLastX + mScaledBitmap.getWidth(), mLastY + mScaledBitmap.getHeight());
+                    moveDistance = 0;
+                    postInvalidate();
                 }
 //                Log.e(TAG,"action move mLastX: "+mLastX+"_mLastY:"+mLastY);
                 break;

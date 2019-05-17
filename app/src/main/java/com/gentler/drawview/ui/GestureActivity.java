@@ -46,7 +46,8 @@ public class GestureActivity extends BaseActivity {
 
     @Override
     public void initView() {
-        GridLayoutManager mGridLayoutManager = new GridLayoutManager(mActivity, 4);
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(mActivity, 2);
+        mGridLayoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
     }
 
