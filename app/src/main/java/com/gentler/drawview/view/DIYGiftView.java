@@ -50,6 +50,8 @@ public class DIYGiftView extends View {
     private Paint mBorderPaint;
     private int mBorderPadding = 3;
     private Path mBorderPath;
+    private float mDisplaySize;
+    private int mDistance;
 
 
     public DIYGiftView(Context context) {
@@ -63,6 +65,7 @@ public class DIYGiftView extends View {
     public DIYGiftView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.mContext = context;
+        mDisplaySize = mContext.getResources().getDimension(R.dimen.gesture_gift_size);
         init();
     }
 
@@ -85,7 +88,10 @@ public class DIYGiftView extends View {
         this.mBitmapResId = bitmapSource;
         if (null != mBitmap) {
             mBitmap = BitmapFactory.decodeResource(getResources(), bitmapSource);
-            mScaledBitmap = ImageUtils.scale(mBitmap, 1f, 1f);
+            float scaleW = mDisplaySize / mBitmap.getWidth();
+            float scaleH = mDisplaySize / mBitmap.getHeight();
+            mScaledBitmap = ImageUtils.scale(mBitmap, scaleW, scaleH);
+            mDistance = mScaledBitmap.getWidth();
         }
     }
 
@@ -174,6 +180,7 @@ public class DIYGiftView extends View {
                 mDownY = (int) event.getY();
                 mLastX = mDownX;
                 mLastY = mDownY;
+                moveDistance = 0;
                 mDIYGiftModel.setX(mDownX);
                 mDIYGiftModel.setY(mDownY);
                 mDiyGiftModelList.add(mDIYGiftModel);
@@ -193,7 +200,7 @@ public class DIYGiftView extends View {
                 Log.e(TAG, "moveDistance:" + moveDistance);
 
 //                Log.e(TAG,"Math.pow(90,2):"+(int)Math.pow(90,2));
-                if (moveDistance >= reference/* - 2000&& distance <= reference + 2000*/) {
+                if (moveDistance >= mDistance/* - 2000&& distance <= reference + 2000*/) {
                     mDIYGiftModel = new DIYGiftModel();
                     mDIYGiftModel.setGiftRes(mBitmapResId);
                     mDIYGiftModel.setX(moveX);

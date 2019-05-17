@@ -5,6 +5,12 @@
     android:layout_height="match_parent"
     tools:context="com.gentler.drawview.ui.MainActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/icon" />
+
     <LinearLayout
         android:id="@+id/lay_menus"
         android:layout_width="match_parent"

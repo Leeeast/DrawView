@@ -47,12 +47,12 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private int mLastY;
     private DrawThread mDrawThread;
     private Rect mRect;
-    private VelocityTracker mVelocityTracker=null;
+    private VelocityTracker mVelocityTracker = null;
     private int mFirstPointerId;
     private int mMaxVelocity;
     private float mVelocityX;
     private float mVelocityY;
-    private boolean isFirst=true;
+    private boolean isFirst = true;
 
 
     public DrawSurfaceView(Context context) {
@@ -70,7 +70,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void init() {
-        mVelocityTracker=VelocityTracker.obtain();
+        mVelocityTracker = VelocityTracker.obtain();
         mRect = new Rect();
         initBitmap();
         initPaint();
@@ -121,13 +121,13 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
 
-    public Rect getGraphicRect(){
+    public Rect getGraphicRect() {
         return mRect;
     }
 
-    public void getVelocityTracker(){
-        if (null==mVelocityTracker){
-            mVelocityTracker=VelocityTracker.obtain();
+    public void getVelocityTracker() {
+        if (null == mVelocityTracker) {
+            mVelocityTracker = VelocityTracker.obtain();
         }
         mMaxVelocity = ViewConfiguration.get(mContext).getMaximumFlingVelocity();
     }
@@ -174,7 +174,6 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             DIYGiftModel point = iterator.next();
             if (null != point) {
                 canvas.drawBitmap(mScaledBitmap, point.getX() - mScaledBitmap.getWidth() / 2, point.getY() - mScaledBitmap.getHeight() / 2, mPaint);
-
             }
         }
     }
@@ -194,18 +193,18 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 mLastX = mDownX;
                 mLastY = mDownY;
                 //默认初始值为0
-                if (isFirst){
+                if (isFirst) {
                     mRect.left = mLastX;
                     mRect.top = mLastY;
                     mRect.bottom = mLastY;
                     mRect.right = mLastX;
-                    isFirst=false;
-                }else{
+                    isFirst = false;
+                } else {
                     //计算出图形所在的区域范围
-                    mRect.left=Math.min(mRect.left,mLastX);
-                    mRect.right=Math.max(mRect.right,mLastX);
-                    mRect.top=Math.min(mRect.top,mLastY);
-                    mRect.bottom=Math.max(mRect.bottom,mLastY);
+                    mRect.left = Math.min(mRect.left, mLastX);
+                    mRect.right = Math.max(mRect.right, mLastX);
+                    mRect.top = Math.min(mRect.top, mLastY);
+                    mRect.bottom = Math.max(mRect.bottom, mLastY);
                 }
                 mDIYGiftModel.setX(mDownX);
                 mDIYGiftModel.setY(mDownY);
@@ -228,8 +227,8 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 int distance = (int) Math.pow(moveX - mLastX, 2) + (int) Math.pow(moveY - mLastY, 2);
 
                 int reference = (int) Math.pow(80, 2);
-                Log.e(TAG,"distance:"+distance);
-                Log.e(TAG,"distance开方:"+Math.pow(distance,0.5));
+                Log.e(TAG, "distance:" + distance);
+                Log.e(TAG, "distance开方:" + Math.pow(distance, 0.5));
 
 //                Log.e(TAG,"Math.pow(90,2):"+(int)Math.pow(90,2));
                 if (distance >= reference/* - 2000&& distance <= reference + 2000*/) {
@@ -242,10 +241,10 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     mLastY = moveY;
 
                     //计算出图形所在的区域范围
-                    mRect.left=Math.min(mRect.left,mLastX);
-                    mRect.right=Math.max(mRect.right,mLastX);
-                    mRect.top=Math.min(mRect.top,mLastY);
-                    mRect.bottom=Math.max(mRect.bottom,mLastY);
+                    mRect.left = Math.min(mRect.left, mLastX);
+                    mRect.right = Math.max(mRect.right, mLastX);
+                    mRect.top = Math.min(mRect.top, mLastY);
+                    mRect.bottom = Math.max(mRect.bottom, mLastY);
 
                     postInvalidate();
                 }
@@ -260,22 +259,22 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         return super.onTouchEvent(event);
     }
 
-    private void releaseVelocityTracker(){
-        if (null!=mVelocityTracker){
+    private void releaseVelocityTracker() {
+        if (null != mVelocityTracker) {
             mVelocityTracker.clear();
             mVelocityTracker.recycle();
-            mVelocityTracker=null;
+            mVelocityTracker = null;
         }
     }
 
     public void reset() {
         mDiyGiftModelList.clear();
-        mRect.set(0,0,0,0);
-        isFirst=true;
+        mRect.set(0, 0, 0, 0);
+        isFirst = true;
         postInvalidate();
     }
 
-    public void onClickSure(){
+    public void onClickSure() {
 
     }
 

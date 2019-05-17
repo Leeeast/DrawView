@@ -38,7 +38,7 @@ public class HeartActivity extends BaseActivity {
     AppCompatButton mBtnSave;
 
 
-    private ArrayList<DIYGiftModel> mGiftModelList=new ArrayList<>();
+    private ArrayList<DIYGiftModel> mGiftModelList = new ArrayList<>();
     private DIYGiftAdapter mAdapter;
 
 
@@ -49,7 +49,8 @@ public class HeartActivity extends BaseActivity {
 
     @Override
     public void initView() {
-        GridLayoutManager mGridLayoutManager=new GridLayoutManager(mActivity,4);
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(mActivity, 1);
+        mGridLayoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
     }
 
@@ -58,13 +59,13 @@ public class HeartActivity extends BaseActivity {
         mAdapter = new DIYGiftAdapter(getLayoutInflater());
         mRecyclerView.setAdapter(mAdapter);
         DIYGiftModel model;
-        for (int i = 0; i< DIYGiftRes.mDIYGiftResArray.length; i++){
-            model=new DIYGiftModel();
+        for (int i = 0; i < DIYGiftRes.mDIYGiftResArray.length; i++) {
+            model = new DIYGiftModel();
             model.setGiftRes(DIYGiftRes.mDIYGiftResArray[i]);
             mGiftModelList.add(model);
         }
         mAdapter.setData(mGiftModelList);
-        mDrawSurfaceView.startDraw();
+        //mDrawSurfaceView.startDraw();
     }
 
     @Override
@@ -72,23 +73,23 @@ public class HeartActivity extends BaseActivity {
         mAdapter.setOnGiftItemClickListener(new DIYGiftAdapter.OnGiftItemClickListener() {
             @Override
             public void onGiftItemClick(DIYGiftAdapter.DIYGiftViewHolder holder, int position) {
-                DIYGiftModel model=mGiftModelList.get(position);
+                DIYGiftModel model = mGiftModelList.get(position);
                 mDrawSurfaceView.setBitmapSource(model.getGiftRes());
             }
         });
     }
 
     @OnClick(R.id.btn_reset)
-    public void onClickReset(View view){
+    public void onClickReset(View view) {
         mDrawSurfaceView.reset();
     }
 
     @OnClick(R.id.btn_save)
-    public void onClickSave(View view){
-        ArrayList<DIYGiftModel> diyGiftModels= (ArrayList<DIYGiftModel>) mDrawSurfaceView.getDataList();
-        Intent intent=new Intent(HeartActivity.this,ReappearActivity.class);
-        intent.putParcelableArrayListExtra(MyParams.INTENT_ARRAY_LIST_GIFT,diyGiftModels);
-        Rect rect=mDrawSurfaceView.getGraphicRect();
+    public void onClickSave(View view) {
+        ArrayList<DIYGiftModel> diyGiftModels = (ArrayList<DIYGiftModel>) mDrawSurfaceView.getDataList();
+        Intent intent = new Intent(HeartActivity.this, ReappearActivity.class);
+        intent.putParcelableArrayListExtra(MyParams.INTENT_ARRAY_LIST_GIFT, diyGiftModels);
+        Rect rect = mDrawSurfaceView.getGraphicRect();
 
         startActivity(intent);
     }
