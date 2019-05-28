@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
@@ -31,18 +32,18 @@ import butterknife.OnClick;
  * Created by admin on 2017/11/8.
  */
 
-public class ReappearSurfaceView extends SurfaceView implements SurfaceHolder.Callback{
-    private static final String TAG=ReappearSurfaceView.class.getSimpleName();
+public class ReappearSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+    private static final String TAG = ReappearSurfaceView.class.getSimpleName();
     private Context mContext;
-    private boolean isRun=false;
+    private boolean isRun = false;
     private Paint mPaint;
     private Bitmap mBitmap;
     private Bitmap mLastBitmap;
     private Bitmap mScaledBitmap;
     private DIYGiftModel mDIYGiftModel;
     private int mBitmapResId;
-    CopyOnWriteArrayList<DIYGiftModel> mDiyGiftModelList =new CopyOnWriteArrayList<>();
-//    private List<Point> mDiyGiftModelList=new ArrayList<>();
+    CopyOnWriteArrayList<DIYGiftModel> mDiyGiftModelList = new CopyOnWriteArrayList<>();
+    //    private List<Point> mDiyGiftModelList=new ArrayList<>();
     private int mDownX;
     private int mDownY;
     private int mLastX;
@@ -50,16 +51,16 @@ public class ReappearSurfaceView extends SurfaceView implements SurfaceHolder.Ca
 
 
     public ReappearSurfaceView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public ReappearSurfaceView(Context context, AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public ReappearSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.mContext=context;
+        this.mContext = context;
         init();
     }
 
@@ -78,20 +79,20 @@ public class ReappearSurfaceView extends SurfaceView implements SurfaceHolder.Ca
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
     }
 
-    public void setBitmapSource(int bitmapSource){
+    public void setBitmapSource(int bitmapSource) {
 //        mDiyGiftModelList.clear();
-        this.mBitmapResId=bitmapSource;
-        if (null!=mBitmap){
-            mLastBitmap=mBitmap;
-            mLastBitmap=null;
+        this.mBitmapResId = bitmapSource;
+        if (null != mBitmap) {
+            mLastBitmap = mBitmap;
+            mLastBitmap = null;
             mBitmap = BitmapFactory.decodeResource(getResources(), bitmapSource);
-            mScaledBitmap= ImageUtils.scale(mBitmap,0.6f,0.6f);
+            mScaledBitmap = ImageUtils.scale(mBitmap, 0.6f, 0.6f);
         }
     }
 
     private void initBitmap() {
         mBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.heart_small);
-        mScaledBitmap= ImageUtils.scale(mBitmap,0.6f,0.6f);
+        mScaledBitmap = ImageUtils.scale(mBitmap, 0.6f, 0.6f);
     }
 
 
@@ -102,60 +103,60 @@ public class ReappearSurfaceView extends SurfaceView implements SurfaceHolder.Ca
         mPaint.setStrokeWidth(10);
     }
 
-    public void setDataList(CopyOnWriteArrayList<DIYGiftModel> dataList){
-        for (DIYGiftModel model:dataList){
+    public void setDataList(CopyOnWriteArrayList<DIYGiftModel> dataList) {
+        for (DIYGiftModel model : dataList) {
             model.changePosition();
             mDiyGiftModelList.add(model);
         }
     }
 
-    public List<DIYGiftModel> getDataList(){
-        ArrayList<DIYGiftModel> diyGiftModels=new ArrayList<>();
+    public List<DIYGiftModel> getDataList() {
+        ArrayList<DIYGiftModel> diyGiftModels = new ArrayList<>();
         diyGiftModels.addAll(mDiyGiftModelList);
         return diyGiftModels;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.e(TAG,"surfaceCreated");
+        Log.e(TAG, "surfaceCreated");
 
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        Log.e(TAG,"surfaceChanged");
+        Log.e(TAG, "surfaceChanged");
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.e(TAG,"surfaceDestroyed");
-        isRun=false;
-        for (DIYGiftModel model:mDiyGiftModelList){
+        Log.e(TAG, "surfaceDestroyed");
+        isRun = false;
+        for (DIYGiftModel model : mDiyGiftModelList) {
             model.cancelTask();
         }
 
 
     }
 
-    public void startDraw(){
-        isRun=true;
+    public void startDraw() {
+        isRun = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(isRun){
-                    Canvas canvas=null;
+                while (isRun) {
+                    Canvas canvas = null;
                     try {
-                        canvas=getHolder().lockCanvas();
-                        if (null!=canvas){
+                        canvas = getHolder().lockCanvas();
+                        if (null != canvas) {
                             //TODO 绘制
                             SystemClock.sleep(20);
                             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
                             drawSomething(canvas);
                             getHolder().unlockCanvasAndPost(canvas);
                         }
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
-                        if (null!=canvas){
+                        if (null != canvas) {
                             getHolder().unlockCanvasAndPost(canvas);
                         }
                     }
@@ -165,16 +166,20 @@ public class ReappearSurfaceView extends SurfaceView implements SurfaceHolder.Ca
     }
 
     private void drawSomething(Canvas canvas) {
-        if (mDiyGiftModelList.size()==0){
+        if (mDiyGiftModelList.size() == 0) {
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
             return;
         }
 //        canvas.drawBitmap(mScaledBitmap,100,100,mPaint);
-        Iterator<DIYGiftModel> iterator= mDiyGiftModelList.iterator();
-        while (iterator.hasNext()){
-            DIYGiftModel point=iterator.next();
-            if (null!=point){
-                canvas.drawBitmap(mScaledBitmap, point.getX()-mScaledBitmap.getWidth()/2,point.getY()-mScaledBitmap.getHeight()/2,mPaint);
+        Iterator<DIYGiftModel> iterator = mDiyGiftModelList.iterator();
+        while (iterator.hasNext()) {
+            DIYGiftModel point = iterator.next();
+            if (null != point) {
+                Matrix matrix = new Matrix();
+                matrix.postRotate(point.getDegree(), mScaledBitmap.getWidth() / 2, mScaledBitmap.getHeight() / 2);
+                matrix.postTranslate(point.getX() - mScaledBitmap.getWidth() / 2, point.getY() - mScaledBitmap.getHeight() / 2);
+                canvas.drawBitmap(mScaledBitmap, matrix, mPaint);
+                //canvas.drawBitmap(mScaledBitmap, point.getX() - mScaledBitmap.getWidth() / 2, point.getY() - mScaledBitmap.getHeight() / 2, mPaint);
             }
         }
     }
@@ -220,18 +225,11 @@ public class ReappearSurfaceView extends SurfaceView implements SurfaceHolder.Ca
 //        return super.onTouchEvent(event);
 //    }
 
-    public void reset(){
+    public void reset() {
         mDiyGiftModelList.clear();
 
         postInvalidate();
     }
-
-
-
-
-
-
-
 
 
 }

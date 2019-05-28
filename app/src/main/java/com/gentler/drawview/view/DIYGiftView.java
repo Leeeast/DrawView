@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathEffect;
@@ -15,6 +16,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.gentler.drawview.R;
 import com.gentler.drawview.model.DIYGiftModel;
@@ -23,6 +25,7 @@ import com.gentler.drawview.utils.ImageUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -137,16 +140,30 @@ public class DIYGiftView extends View {
         while (iterator.hasNext()) {
             DIYGiftModel point = iterator.next();
             if (null != point) {
-                canvas.drawBitmap(mScaledBitmap, point.getX() - mScaledBitmap.getWidth() / 2, point.getY() - mScaledBitmap.getHeight() / 2, mPaint);
+                Matrix matrix = new Matrix();
+                matrix.postTranslate(point.getX() - mScaledBitmap.getWidth() / 2, point.getY() - mScaledBitmap.getHeight() / 2);
+                canvas.drawBitmap(mScaledBitmap, matrix, mPaint);
+                //canvas.drawBitmap(mScaledBitmap, point.getX() - mScaledBitmap.getWidth() / 2, point.getY() - mScaledBitmap.getHeight() / 2, mPaint);
             }
         }
     }
 
     @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        ListIterator<DIYGiftModel> iterator = mDiyGiftModelList.listIterator();
+        while (iterator.hasNext()) {
+            iterator.next().cancelTask();
+        }
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
-        //super.onDraw(canvas);
+        long startTime = System.currentTimeMillis();
         drawBorder(canvas);
         drawSomething(canvas);
+        long drawTime = System.currentTimeMillis() - startTime;
+        postInvalidateDelayed(50 - drawTime);
     }
 
     private void drawBorder(Canvas canvas) {
@@ -184,7 +201,7 @@ public class DIYGiftView extends View {
                 mDIYGiftModel.setX(mDownX);
                 mDIYGiftModel.setY(mDownY);
                 mDiyGiftModelList.add(mDIYGiftModel);
-                postInvalidate();
+                //postInvalidate();
                 return true;
             case MotionEvent.ACTION_MOVE:
                 int moveX = (int) event.getX();
@@ -194,7 +211,6 @@ public class DIYGiftView extends View {
                 moveDistance += (int) Math.pow(distance, 0.5);
                 mLastX = moveX;
                 mLastY = moveY;
-                int reference = 100;
                 Log.e(TAG, "distance:" + distance);
                 Log.e(TAG, "distance开方:" + Math.pow(distance, 0.5));
                 Log.e(TAG, "moveDistance:" + moveDistance);
@@ -206,9 +222,9 @@ public class DIYGiftView extends View {
                     mDIYGiftModel.setX(moveX);
                     mDIYGiftModel.setY(moveY);
                     mDiyGiftModelList.add(mDIYGiftModel);
-//                    postInvalidate(mLastX, mLastY, mLastX + mScaledBitmap.getWidth(), mLastY + mScaledBitmap.getHeight());
+                    //postInvalidate(mLastX, mLastY, mLastX + mScaledBitmap.getWidth(), mLastY + mScaledBitmap.getHeight());
                     moveDistance = 0;
-                    postInvalidate();
+//                    postInvalidate();
                 }
 //                Log.e(TAG,"action move mLastX: "+mLastX+"_mLastY:"+mLastY);
                 break;

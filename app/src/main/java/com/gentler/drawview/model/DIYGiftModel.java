@@ -14,22 +14,23 @@ import java.util.TimerTask;
  */
 
 public class DIYGiftModel implements Parcelable {
-    private static final String TAG=DIYGiftModel.class.getSimpleName();
+    private static final String TAG = DIYGiftModel.class.getSimpleName();
     private int x;
     private int y;
+    private int degree;
     private int giftRes;
-    private int count= (int) (Math.random()*3);
+    private int count = (int) (Math.random() * 3);
     private TimerTask mTimerTask;
     private Timer mTimer;
 
-    public DIYGiftModel(){
+    public DIYGiftModel() {
         super();
     }
 
     protected DIYGiftModel(Parcel in) {
-        x=in.readInt();
-        y=in.readInt();
-        giftRes =in.readInt();
+        x = in.readInt();
+        y = in.readInt();
+        giftRes = in.readInt();
     }
 
     public static final Creator<DIYGiftModel> CREATOR = new Creator<DIYGiftModel>() {
@@ -56,10 +57,10 @@ public class DIYGiftModel implements Parcelable {
         dest.writeInt(giftRes);
     }
 
-    public void changePosition(){
+    public void changePosition() {
         mTimer = new Timer();
         mTimerTask = getTimerTask();
-        mTimer.schedule(mTimerTask,1000,50);
+        mTimer.schedule(mTimerTask, 1000, 20);
     }
 
     public TimerTask getTimerTask() {
@@ -69,25 +70,22 @@ public class DIYGiftModel implements Parcelable {
             public void run() {
                 // 需要做的事:发送消息
                 count++;
-                float angle = (float) (0.1* Constants.PI* count);
-                int diff= (int) (4*Math.sin(angle));
-                setX(x+diff);
-                String name=Thread.currentThread().getName();
-                Log.e(TAG,"name:"+name);
-//                setY(y+diff);
+                float angle = (float) (0.1 * Math.PI * count);
+                int diff = (int) (10 * Math.sin(angle));
+                setDegree(diff);
             }
         };
         return task;
     }
 
-    public void cancelTask(){
-        if (null!=mTimerTask){
+    public void cancelTask() {
+        if (null != mTimerTask) {
             mTimerTask.cancel();
-            mTimerTask=null;
+            mTimerTask = null;
         }
-        if (null!=mTimer){
+        if (null != mTimer) {
             mTimer.cancel();
-            mTimer=null;
+            mTimer = null;
         }
     }
 
@@ -113,6 +111,14 @@ public class DIYGiftModel implements Parcelable {
 
     public void setGiftRes(int giftRes) {
         this.giftRes = giftRes;
+    }
+
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
     }
 
     @Override
