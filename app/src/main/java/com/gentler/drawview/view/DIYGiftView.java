@@ -10,13 +10,11 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathEffect;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
+import android.graphics.PathMeasure;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.gentler.drawview.R;
 import com.gentler.drawview.model.DIYGiftModel;
@@ -40,22 +38,24 @@ public class DIYGiftView extends View {
     private Bitmap mScaledBitmap;
     private DIYGiftModel mDIYGiftModel;
     private int mBitmapResId;
-    //    CopyOnWriteArrayList<DIYGiftModel> mDiyGiftModelList = new CopyOnWriteArrayList<>();
-    private List<DIYGiftModel> mDiyGiftModelList = new ArrayList<>();
+    CopyOnWriteArrayList<DIYGiftModel> mDiyGiftModelList = new CopyOnWriteArrayList<>();
+    //    private List<DIYGiftModel> mDiyGiftModelList = new ArrayList<>();
     private int mDownX;
     private int mDownY;
-    private int mLastX;
-    private int mLastY;
+    private float mLastX;
+    private float mLastY;
     private int moveDistance;
     private int backgroundColor = Color.argb(204, 0, 0, 0);
     private int mWidth;
     private int mHeight;
     private Paint mBorderPaint;
     private int mBorderPadding = 3;
-    private Path mBorderPath;
+    private Path mBorderPath, mGiftPath;
+    private PathMeasure mPathMeasure;
+    private float[] mPos = new float[2], mTan = new float[2];
+    private List<Path> mGiftPaths = new ArrayList<>();
     private float mDisplaySize;
     private int mDistance;
-
 
     public DIYGiftView(Context context) {
         this(context, null);
@@ -88,6 +88,7 @@ public class DIYGiftView extends View {
 
     public void setBitmapSource(int bitmapSource) {
         mDiyGiftModelList.clear();
+        mGiftPaths.clear();
         this.mBitmapResId = bitmapSource;
         if (null != mBitmap) {
             mBitmap = BitmapFactory.decodeResource(getResources(), bitmapSource);
@@ -159,11 +160,11 @@ public class DIYGiftView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        long startTime = System.currentTimeMillis();
+        // long startTime = System.currentTimeMillis();
         drawBorder(canvas);
         drawSomething(canvas);
-        long drawTime = System.currentTimeMillis() - startTime;
-        postInvalidateDelayed(50 - drawTime);
+//        long drawTime = System.currentTimeMillis() - startTime;
+//        postInvalidateDelayed(50 - drawTime);
     }
 
     private void drawBorder(Canvas canvas) {
@@ -188,56 +189,61 @@ public class DIYGiftView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int action = event.getAction();
+        int action = event.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                mDIYGiftModel = new DIYGiftModel();
-                mDIYGiftModel.setGiftRes(mBitmapResId);
-                mDownX = (int) event.getX();
-                mDownY = (int) event.getY();
-                mLastX = mDownX;
-                mLastY = mDownY;
-                moveDistance = 0;
-                mDIYGiftModel.setX(mDownX);
-                mDIYGiftModel.setY(mDownY);
-                mDiyGiftModelList.add(mDIYGiftModel);
-                //postInvalidate();
+                mGiftPath = new Path();
+                mGiftPaths.add(mGiftPath);
+                mGiftPath.moveTo(event.getX(), event.getY());
+                mGiftPath.lineTo(event.getX() + 0.01f, event.getY() + 0.01f);
+                mLastX = event.getX();
+                mLastY = event.getY();
+                calculatePlotPoint();
                 return true;
             case MotionEvent.ACTION_MOVE:
-                int moveX = (int) event.getX();
-                int moveY = (int) event.getY();
-
-                int distance = (int) Math.pow(moveX - mLastX, 2) + (int) Math.pow(moveY - mLastY, 2);
-                moveDistance += (int) Math.pow(distance, 0.5);
-                mLastX = moveX;
-                mLastY = moveY;
-                Log.e(TAG, "distance:" + distance);
-                Log.e(TAG, "distance开方:" + Math.pow(distance, 0.5));
-                Log.e(TAG, "moveDistance:" + moveDistance);
-
-//                Log.e(TAG,"Math.pow(90,2):"+(int)Math.pow(90,2));
-                if (moveDistance >= mDistance/* - 2000&& distance <= reference + 2000*/) {
-                    mDIYGiftModel = new DIYGiftModel();
-                    mDIYGiftModel.setGiftRes(mBitmapResId);
-                    mDIYGiftModel.setX(moveX);
-                    mDIYGiftModel.setY(moveY);
-                    mDiyGiftModelList.add(mDIYGiftModel);
-                    //postInvalidate(mLastX, mLastY, mLastX + mScaledBitmap.getWidth(), mLastY + mScaledBitmap.getHeight());
-                    moveDistance = 0;
-//                    postInvalidate();
-                }
-//                Log.e(TAG,"action move mLastX: "+mLastX+"_mLastY:"+mLastY);
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                break;
-            case MotionEvent.ACTION_UP:
+                mGiftPath.quadTo(
+                        mLastX,
+                        mLastY,
+                        (event.getX() + mLastX) / 2,
+                        (event.getY() + mLastY) / 2);
+                mLastX = event.getX();
+                mLastY = event.getY();
+                calculatePlotPoint();
                 break;
         }
         return super.onTouchEvent(event);
     }
 
+    public void calculatePlotPoint() {
+        mDiyGiftModelList.clear();
+        ListIterator<Path> iterator = mGiftPaths.listIterator();
+        while (iterator.hasNext()) {
+            Path path = iterator.next();
+            mPathMeasure = new PathMeasure(path, false);
+            mPathMeasure.setPath(path, false);
+            float length = mPathMeasure.getLength();
+            int num = (int) Math.ceil(length / mDisplaySize);
+            for (int i = 0; i < num; i++) {
+                boolean result = mPathMeasure.getPosTan(mDisplaySize * i, mPos, mTan);
+                if (result) {
+                    addPoint(mPos[0], mPos[1]);
+                    Log.e(TAG, "[x,y]:[" + mPos[0] + "," + mPos[1] + "]");
+                }
+            }
+        }
+    }
+
+    public void addPoint(float x, float y) {
+        DIYGiftModel diyGiftModel = new DIYGiftModel();
+        diyGiftModel.setX(Math.round(x));
+        diyGiftModel.setY(Math.round(y));
+        mDiyGiftModelList.add(diyGiftModel);
+        invalidate();
+    }
+
     public void reset() {
         mDiyGiftModelList.clear();
+        mGiftPaths.clear();
         postInvalidate();
     }
 }

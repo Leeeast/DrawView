@@ -73,7 +73,7 @@ public class DIYView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawPath(mPath,mPaint);
+        canvas.drawPath(mPath, mPaint);
     }
 
     @Override
@@ -81,10 +81,11 @@ public class DIYView extends View {
         int action = event.getAction();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                mPath.moveTo(event.getX(),event.getY());
+                mPath.moveTo(event.getX(), event.getY());
                 return true;
             case MotionEvent.ACTION_MOVE:
-                mPath.lineTo(event.getX(),event.getY());
+                Log.e(TAG, "moveX,moveY:" + getX());
+                mPath.lineTo(event.getX(), event.getY());
                 postInvalidate();
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -96,7 +97,7 @@ public class DIYView extends View {
     }
 
 
-    public void reset(){
+    public void reset() {
         mPath.reset();
         invalidate();
     }
